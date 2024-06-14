@@ -1,25 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useContext } from "react";
+import { ReduceContext, ReduceContextType } from "./context/ReduceContext";
+import { useQuestions } from "./hooks/useQuestions";
+import Quiz from "./components/quiz/Quiz";
+import StartScreen from "./components/view/StartScreen";
+import Progress from "./components/widgets/Progress";
+import FinishScreen from "./components/view/FinishScreen";
+import Timer from "./components/widgets/Timer";
+import styled from "styled-components";
+import Footer from "./components/ui/Footer";
+import NextButton from "./components/ui/NextButton";
 
-function App() {
+const AppStyle = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ErrorStyle = styled.div`
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  padding: 2rem;
+  background-color: #495057;
+  border-radius: 100px;
+`;
+
+const App = () => {
+  const {state} = useContext(ReduceContext) as ReduceContextType;
+  const {status} = state;
+  useQuestions();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <AppStyle>
+          {status === 'loading' && <div>Loading</div>}
+          {status === 'error' && <ErrorStyle>Error</ErrorStyle>}
+          {status === 'ready' && <StartScreen />}
+          {status === 'active' && (
+            <>
+              <Progress />
+              <Quiz />
+              <Footer>
+                <Timer />
+                <NextButton />
+              </Footer>
+            </>
+          )}
+          {status === 'finished' && (
+            <FinishScreen />
+            )}
+      </AppStyle>
   );
 }
 
